@@ -1,5 +1,7 @@
+import flask_marshmallow
 from flask import Flask
 
+import minesweeper.api
 import minesweeper.config
 
 
@@ -12,7 +14,8 @@ def create_app(config: object = minesweeper.config.Config) -> Flask:
 
 
 def register_extensions(app: Flask):
-    pass
+    flask_marshmallow.Marshmallow().init_app(app)
+    # TODO: Register Sentry or other Crash Analytic app
 
 
 def register_blueprints(app: Flask):
@@ -24,3 +27,5 @@ def register_blueprints(app: Flask):
         :return: 200
         """
         return {"status": "OK"}
+
+    app.register_blueprint(minesweeper.api.get_blueprint())
