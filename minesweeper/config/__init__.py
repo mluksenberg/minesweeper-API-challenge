@@ -1,13 +1,24 @@
+import os
+
+
 class BaseConfig(object):
     """
     Base Configuration
     """
-    pass
+    ENV = None
+    DEBUG = True
 
 
 class LocalConfig(BaseConfig):
-    pass
+    ENV = "local"
+    DEBUG = True
 
 
 class DevConfig(BaseConfig):
-    pass
+    ENV = "dev"
+    DEBUG = False
+
+
+ENV = os.environ.get('ENV')
+config_class = f"{ENV.title()}Config" if ENV is not None else "BaseConfig"
+Config = globals()[config_class]
