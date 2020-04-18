@@ -7,6 +7,7 @@ class BaseConfig(object):
     """
     ENV = None
     DEBUG = True
+    ERROR_INCLUDE_MESSAGE = False
 
 
 class LocalConfig(BaseConfig):
