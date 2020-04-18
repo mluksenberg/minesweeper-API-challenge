@@ -25,6 +25,7 @@ class LocalConfig(BaseConfig):
     ENV = "local"
     DEBUG = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
+    SQLALCHEMY_ECHO = True
     SQLALCHEMY_DATABASE_URI = f"mysql://root:root1234@127.0.0.1/minesweeper"
 
 

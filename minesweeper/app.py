@@ -42,4 +42,9 @@ def register_errors(app: Flask):
 
     @app.errorhandler(Exception)
     def handle_unknown_exception(error):
-        return {"code": 500, "message": "Internal Server Error"}, 500
+        json = {"code": 500, "message": "Internal Server Error"}
+        if minesweeper.config.Config.DEBUG \
+                and error.args \
+                and type(error.args[0]) == str:
+            json["description"] = error.args[0]
+        return json, 500

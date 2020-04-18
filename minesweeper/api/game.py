@@ -4,6 +4,7 @@ import flask_restplus
 import webargs.flaskparser
 
 from minesweeper.schema.game import GamePostRequestSchema
+from minesweeper.services.game import create_game
 
 logger = logging.getLogger(__name__)
 
@@ -21,4 +22,4 @@ class GameList(flask_restplus.Resource):
     @staticmethod
     @webargs.flaskparser.use_kwargs(GamePostRequestSchema())
     def post(mines, width, height):
-        return dict(mines=mines, width=width, height=height)
+        return create_game(mines, width, height)

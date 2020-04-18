@@ -23,17 +23,28 @@ class Cell(db.Model):
                         db.BigInteger,
                         db.ForeignKey("games.id", ondelete="CASCADE"),
                         nullable=False)
-    status = db.Column("status", db.Enum(CellStatus), nullable=False)
-    has_mine = db.Column("has_mine", db.Boolean, nullable=False)
+    status = db.Column("status", db.Enum(CellStatus),
+                       nullable=False,
+                       default=CellStatus.UNKNOWN)
+    has_mine = db.Column("has_mine", db.Boolean, nullable=False, default=False)
     coordinate_x = db.Column("x", db.BigInteger, nullable=False)
     coordinate_y = db.Column("y", db.BigInteger, nullable=False)
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 
 
 class Game(db.Model):
     __tablename__ = "games"
 
     game_id = db.Column("id", db.BigInteger, primary_key=True)
-    status = db.Column("status", db.Enum(GameStatus), nullable=False)
+    status = db.Column("status", db.Enum(GameStatus), nullable=False,
+                       default=GameStatus.IN_PROGRESS)
     datetime = db.Column("datetime", db.BigInteger, nullable=False,
                          default=datetime.utcnow().timestamp())
     cells = db.relationship(Cell, cascade="all, delete-orphan", lazy=True)
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
