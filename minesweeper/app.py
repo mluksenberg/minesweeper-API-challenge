@@ -1,10 +1,8 @@
-
-
-import flask_marshmallow
 from flask import Flask
 
 import minesweeper.api
 import minesweeper.config
+import minesweeper.extensions
 
 
 def create_app(config: object = minesweeper.config.Config) -> Flask:
@@ -17,7 +15,8 @@ def create_app(config: object = minesweeper.config.Config) -> Flask:
 
 
 def register_extensions(app: Flask):
-    flask_marshmallow.Marshmallow().init_app(app)
+    minesweeper.extensions.marshmallow.init_app(app)
+    minesweeper.extensions.db.init_app(app)
     # TODO: Register Sentry or other Crash Analytic app
 
 
