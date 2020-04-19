@@ -4,10 +4,11 @@ import flask_restplus
 import webargs.flaskparser
 
 from minesweeper.errors import HttpError
+from minesweeper.models.game import CellStatus
 from minesweeper.schema.game import GameListPostRequestSchema, GameModelSchema, \
-    GameListGetRequestSchema
+    GameListGetRequestSchema, GamePutRequestSchema
 from minesweeper.services.game import create_game, get_games, get_game_by_id, \
-    delete_game_by_id
+    delete_game_by_id, set_cell_action
 
 logger = logging.getLogger(__name__)
 
@@ -33,12 +34,22 @@ class Game(flask_restplus.Resource):
                             message=f"Game with ID {game_id} not found")
         return GameModelSchema().dump(game)
 
+    @staticmethod
+    @webargs.flaskparser.use_kwargs(GamePutRequestSchema())
+    def put(game_id, action, coordinate_x, coordinate_y):
+        game = set_cell_action(game_id, coordinate_x, coordinate_y, action)
+        if not game:
+            raise HttpError(code=404,
+                            message=f"Game with ID {game_id} not found")
+        return GameModelSchema().dump(game)
+
+
 @game_ns.route("")
 class GameList(flask_restplus.Resource):
 
     @staticmethod
     @webargs.flaskparser.use_kwargs(GameListGetRequestSchema(),
-                                    location="querystring")
+                                    location="query")
     def get(status):
         logger.info("Get all games")
         games = get_games(status)

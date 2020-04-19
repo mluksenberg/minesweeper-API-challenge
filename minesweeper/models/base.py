@@ -11,3 +11,7 @@ class BaseModel(flask_sqlalchemy.Model):
     def delete(self, session):
         session.delete(self)
         session.commit()
+
+    @staticmethod
+    def update(session):
+        session.commit()

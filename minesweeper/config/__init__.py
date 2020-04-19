@@ -7,8 +7,8 @@ class BaseConfig(object):
     """
     ENV = None
     DEBUG = True
-    ERROR_INCLUDE_MESSAGE = False
-    JSON_SORT_KEYS = False
+    ERROR_INCLUDE_MESSAGE = True
+    PROPAGATE_EXCEPTIONS = True
 
     #
     # Database
@@ -33,6 +33,7 @@ class LocalConfig(BaseConfig):
 class DevConfig(BaseConfig):
     ENV = "dev"
     DEBUG = False
+    ERROR_INCLUDE_MESSAGE = False
 
 
 ENV = os.environ.get('ENV')

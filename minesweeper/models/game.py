@@ -6,13 +6,14 @@ from minesweeper.extensions import db
 
 class GameStatus(Enum):
     IN_PROGRESS = 0
-    FINISHED = 1
+    WIN = 1
+    LOST = 2
 
 
 class CellStatus(Enum):
     UNKNOWN = 0
-    FLAG = 1
     DISCOVERED = 2
+    FLAG = 1
 
 
 class Cell(db.Model):
@@ -21,7 +22,9 @@ class Cell(db.Model):
     cell_id = db.Column("id", db.BigInteger, primary_key=True)
     game_id = db.Column("game_id",
                         db.BigInteger,
-                        db.ForeignKey("games.id", ondelete="CASCADE"),
+                        db.ForeignKey("games.id",
+                                      ondelete="CASCADE",
+                                      onupdate="CASCADE"),
                         nullable=False)
     status = db.Column("status", db.Enum(CellStatus),
                        nullable=False,

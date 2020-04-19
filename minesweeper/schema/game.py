@@ -1,12 +1,25 @@
+from enum import Enum
+
 from marshmallow import Schema, fields, validates_schema, ValidationError
 from marshmallow_enum import EnumField
 
 import minesweeper.models.game
 
 
+class ActionCell(Enum):
+    DISCOVER = 0
+    MARK = 1
+
+
 class GameBaseSchema(Schema):
     class Meta:
         ordered = True
+
+
+class GamePutRequestSchema(GameBaseSchema):
+    action = EnumField(ActionCell, required=True)
+    coordinate_x = fields.Integer(required=True, validate=lambda x: x >= 0)
+    coordinate_y = fields.Integer(required=True, validate=lambda x: x >= 0)
 
 
 class GameListPostRequestSchema(GameBaseSchema):

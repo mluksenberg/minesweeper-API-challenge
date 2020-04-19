@@ -1,7 +1,9 @@
 import random
 
+from minesweeper.errors import GameFinishedError, GameCellCoordinatesError
 from minesweeper.extensions import db
-from minesweeper.models.game import Game, Cell
+from minesweeper.models.game import Game, Cell, GameStatus, CellStatus
+from minesweeper.schema.game import ActionCell
 
 
 def create_game(mines, width, height):
@@ -43,5 +45,30 @@ def discover_cell(game_id, coordinate_x, coordinate_y):
     pass
 
 
-def _change_cell_status(cell, status):
-    pass
+def _change_cell_status(game, cell, action):
+    if action == ActionCell.DISCOVER:
+        cell.status = CellStatus.DISCOVERED
+        if cell.has_mine:
+            game.status = GameStatus.LOST
+    if action == ActionCell.MARK:
+        cell.status = CellStatus.FLAG
+    game.update(db.session)
+
+
+def set_cell_action(game_id, coordinate_x, coordinate_y, action_cell):
+    game = get_game_by_id(game_id)
+    if not game:
+        return None
+
+    if game.status != GameStatus.IN_PROGRESS:
+        raise GameFinishedError(game_id)
+
+    cells = [cell for cell in game.cells if cell.coordinate_x == coordinate_x
+            and cell.coordinate_y == coordinate_y]
+    if not cells:
+        raise GameCellCoordinatesError(game_id, coordinate_x, coordinate_y)
+
+    cell = cells[0]
+    _change_cell_status(game, cell, action_cell)
+
+    return game

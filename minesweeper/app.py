@@ -3,7 +3,7 @@ from flask import Flask
 import minesweeper.api
 import minesweeper.config
 import minesweeper.extensions
-from minesweeper.errors import HttpError
+from minesweeper.errors import HttpError, GameBaseError
 
 
 def create_app(config: object = minesweeper.config.Config) -> Flask:
@@ -41,18 +41,9 @@ def register_errors(app: Flask):
         error_message = error.data.get("messages").get("json")
         return {"code": error.code, "message": error_message}, error.code
 
-    @app.errorhandler(HttpError)
+    @app.errorhandler(GameBaseError)
     def handle_http_error(error):
         json = {"code": error.code, "message": error.message}
-        if minesweeper.config.Config.DEBUG and error.description:
+        if minesweeper.config.Config.DEBUG and hasattr(error, "description"):
             json["description"] = error.description
         return json, error.code
-
-    @app.errorhandler(Exception)
-    def handle_unknown_exception(error):
-        json = {"code": 500, "message": "Internal Server Error"}
-        if minesweeper.config.Config.DEBUG \
-                and error.args \
-                and type(error.args[0]) == str:
-            json["description"] = error.args[0]
-        return json, 500
