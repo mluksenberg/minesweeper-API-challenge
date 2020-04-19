@@ -8,6 +8,7 @@ class BaseConfig(object):
     ENV = None
     DEBUG = True
     ERROR_INCLUDE_MESSAGE = False
+    JSON_SORT_KEYS = False
 
     #
     # Database
@@ -24,7 +25,7 @@ class BaseConfig(object):
 class LocalConfig(BaseConfig):
     ENV = "local"
     DEBUG = True
-    SQLALCHEMY_TRACK_MODIFICATIONS = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_DATABASE_URI = f"mysql://root:root1234@127.0.0.1/minesweeper"
 
