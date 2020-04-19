@@ -16,7 +16,7 @@ class GamePostRequestSchema(GameBaseSchema):
 
     @validates_schema
     def validate_mines(self, data, **kwargs):
-        if data["mines"] >= data["width"] + data["height"]:
+        if data["mines"] >= data["width"] * data["height"]:
             raise ValidationError("There are more or equals mines than cells")
 
 
