@@ -3,24 +3,49 @@ import logging
 import flask_restplus
 import webargs.flaskparser
 
-from minesweeper.schema.game import GamePostRequestSchema, GameModelSchema
-from minesweeper.services.game import create_game
+from minesweeper.errors import HttpError
+from minesweeper.schema.game import GameListPostRequestSchema, GameModelSchema, \
+    GameListGetRequestSchema
+from minesweeper.services.game import create_game, get_games, get_game_by_id, \
+    delete_game_by_id
 
 logger = logging.getLogger(__name__)
 
 game_ns = flask_restplus.Namespace("game", description="Game endpoints")
 
 
+@game_ns.route("/<int:game_id>")
+class Game(flask_restplus.Resource):
+
+    @staticmethod
+    def get(game_id):
+        game = get_game_by_id(game_id)
+        if not game:
+            raise HttpError(code=404,
+                            message=f"Game with ID {game_id} not found")
+        return GameModelSchema().dump(game)
+
+    @staticmethod
+    def delete(game_id):
+        game = delete_game_by_id(game_id)
+        if not game:
+            raise HttpError(code=404,
+                            message=f"Game with ID {game_id} not found")
+        return GameModelSchema().dump(game)
+
 @game_ns.route("")
 class GameList(flask_restplus.Resource):
 
     @staticmethod
-    def get():
+    @webargs.flaskparser.use_kwargs(GameListGetRequestSchema(),
+                                    location="querystring")
+    def get(status):
         logger.info("Get all games")
-        return [{"test": "response"}]
+        games = get_games(status)
+        return GameModelSchema().dump(games, many=True)
 
     @staticmethod
-    @webargs.flaskparser.use_kwargs(GamePostRequestSchema())
+    @webargs.flaskparser.use_kwargs(GameListPostRequestSchema())
     def post(mines, width, height):
         logger.info("Creating Game")
         game = create_game(mines, width, height)

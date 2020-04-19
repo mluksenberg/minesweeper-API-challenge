@@ -1,5 +1,6 @@
 import random
 
+from minesweeper.extensions import db
 from minesweeper.models.game import Game, Cell
 
 
@@ -17,7 +18,24 @@ def create_game(mines, width, height):
         cell.has_mine = True
 
     game.cells = cells
-    game.save()
+    game.save(db.session)
+    return game
+
+
+def get_games(status):
+    if status:
+        return Game.query.filter(Game.status == status).all()
+    return Game.query.all()
+
+
+def get_game_by_id(game_id):
+    return Game.query.filter(Game.game_id == game_id).first()
+
+
+def delete_game_by_id(game_id):
+    game = get_game_by_id(game_id)
+    if game:
+        game.delete(db.session)
     return game
 
 

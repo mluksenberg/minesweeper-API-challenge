@@ -30,10 +30,6 @@ class Cell(db.Model):
     coordinate_x = db.Column("x", db.BigInteger, nullable=False)
     coordinate_y = db.Column("y", db.BigInteger, nullable=False)
 
-    def save(self):
-        db.session.add(self)
-        db.session.commit()
-
 
 class Game(db.Model):
     __tablename__ = "games"
@@ -44,7 +40,3 @@ class Game(db.Model):
     datetime = db.Column("datetime", db.BigInteger, nullable=False,
                          default=datetime.utcnow().timestamp())
     cells = db.relationship(Cell, cascade="all, delete-orphan", lazy=True)
-
-    def save(self):
-        db.session.add(self)
-        db.session.commit()

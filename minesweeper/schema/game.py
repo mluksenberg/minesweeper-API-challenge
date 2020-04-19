@@ -9,7 +9,7 @@ class GameBaseSchema(Schema):
         ordered = True
 
 
-class GamePostRequestSchema(GameBaseSchema):
+class GameListPostRequestSchema(GameBaseSchema):
     mines = fields.Integer(required=True, validate=lambda x: x > 0)
     width = fields.Integer(required=True, validate=lambda x: x > 0)
     height = fields.Integer(required=True, validate=lambda x: x > 0)
@@ -18,6 +18,12 @@ class GamePostRequestSchema(GameBaseSchema):
     def validate_mines(self, data, **kwargs):
         if data["mines"] >= data["width"] * data["height"]:
             raise ValidationError("There are more or equals mines than cells")
+
+
+class GameListGetRequestSchema(GameBaseSchema):
+    status = EnumField(minesweeper.models.game.GameStatus,
+                       required=False,
+                       dump_by=EnumField.VALUE)
 
 
 class CellModelSchema(GameBaseSchema):
