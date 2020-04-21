@@ -10,6 +10,7 @@ class ActionCell(Enum):
     DISCOVER = 0
     MARK_FLAG = 1
     MARK_QUESTION = 2
+    MARK_UNKNOWN = 3
 
 
 class GameBaseSchema(Schema):
