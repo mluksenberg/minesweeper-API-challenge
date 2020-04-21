@@ -108,9 +108,9 @@ def show_board(ctx, game_id):
 
 
 def _draw_game_context(response):
-    time = datetime.datetime.utcfromtimestamp(
-        datetime.datetime.utcnow().timestamp() - response.get(
-            "datetime")).strftime("%H:%M:%S")
+    time = datetime.datetime.fromtimestamp(
+        datetime.datetime.utcnow().timestamp() - response.get("datetime")
+    ).strftime("%H:%M:%S")
     status = response.get("status")
     click.echo(f"Status: {status}\nClock: {time}")
 
@@ -199,7 +199,7 @@ def show_games(ctx, status):
         click.echo(click.style(f"Error: {response.text}", fg="red"))
     else:
         for game in response.json():
-            click.echo(f"- ID: {game.get('id')}")
+            click.echo(f"- [{game.get('status')}] ID: {game.get('id')}")
 
 
 if __name__ == '__main__':
