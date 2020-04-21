@@ -13,21 +13,13 @@ class BaseConfig(object):
     #
     # Database
     #
-    DB_HOST = os.getenv("DB_HOST", "localhost")
-    DB_USER = os.getenv("DB_USERNAME")
-    DB_PASSWORD = os.getenv("DB_PASSWORD")
-    DB_NAME = "minesweeper"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = f"mysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}" \
-                              f"/{DB_NAME}"
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DB_URI")
 
 
 class LocalConfig(BaseConfig):
     ENV = "local"
     DEBUG = True
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_ECHO = True
-    SQLALCHEMY_DATABASE_URI = f"mysql://root:root1234@127.0.0.1/minesweeper"
 
 
 class DevConfig(BaseConfig):
