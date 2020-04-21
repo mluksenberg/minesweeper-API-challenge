@@ -13,13 +13,22 @@ def create_game(mines, width, height):
     for x in range(width):
         for y in range(height):
             cells.append(
-                Cell(game_id=game.game_id, coordinate_x=x, coordinate_y=y)
+                Cell(game_id=game.game_id,
+                     coordinate_x=x,
+                     coordinate_y=y,
+                     value=0)
             )
 
     for cell in random.sample(cells, mines):
         cell.has_mine = True
+        cell.value = None
 
     game.cells = cells
+
+    for cell in cells:
+        cell.value = len([cell for cell in _get_adjacent_cells(game, cell)
+                          if cell.has_mine])
+
     game.save(db.session)
     return game
 
@@ -41,18 +50,38 @@ def delete_game_by_id(game_id):
     return game
 
 
-def discover_cell(game_id, coordinate_x, coordinate_y):
-    pass
+def _discover_cell(game, cell):
+    cell.status = CellStatus.DISCOVERED
+    if cell.has_mine:
+        game.status = GameStatus.LOST
+    else:
+        cells_adjacent = [x for x in _get_adjacent_cells(game, cell)
+                          if x.status in
+                          [CellStatus.UNKNOWN, CellStatus.QUESTION]]
+        if cells_adjacent and not any([cell.has_mine for cell in cells_adjacent]):
+            for cell_adjacent in cells_adjacent:
+                _discover_cell(game, cell_adjacent)
 
 
 def _change_cell_status(game, cell, action):
     if action == ActionCell.DISCOVER:
-        cell.status = CellStatus.DISCOVERED
-        if cell.has_mine:
-            game.status = GameStatus.LOST
-    if action == ActionCell.MARK:
+        _discover_cell(game, cell)
+    elif action == ActionCell.MARK_FLAG:
         cell.status = CellStatus.FLAG
+    elif action == ActionCell.MARK_QUESTION:
+        cell.status = CellStatus.QUESTION
     game.update(db.session)
+
+
+def _get_adjacent_cells(game, cell):
+    return [x for x in game.cells if _is_adjacent_cell(cell, x)]
+
+
+def _is_adjacent_cell(cell, target):
+    return cell.coordinate_x - 1 <= target.coordinate_x <= cell.coordinate_x + 1 \
+           and cell.coordinate_y - 1 <= target.coordinate_y <= cell.coordinate_y + 1 \
+           and (target.coordinate_x, target.coordinate_y) != (
+           cell.coordinate_x, cell.coordinate_y)
 
 
 def set_cell_action(game_id, coordinate_x, coordinate_y, action_cell):
@@ -64,7 +93,7 @@ def set_cell_action(game_id, coordinate_x, coordinate_y, action_cell):
         raise GameFinishedError(game_id)
 
     cells = [cell for cell in game.cells if cell.coordinate_x == coordinate_x
-            and cell.coordinate_y == coordinate_y]
+             and cell.coordinate_y == coordinate_y]
     if not cells:
         raise GameCellCoordinatesError(game_id, coordinate_x, coordinate_y)
 

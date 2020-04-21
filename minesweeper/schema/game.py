@@ -8,7 +8,8 @@ import minesweeper.models.game
 
 class ActionCell(Enum):
     DISCOVER = 0
-    MARK = 1
+    MARK_FLAG = 1
+    MARK_QUESTION = 2
 
 
 class GameBaseSchema(Schema):
@@ -42,6 +43,7 @@ class GameListGetRequestSchema(GameBaseSchema):
 class CellModelSchema(GameBaseSchema):
     id = fields.Integer(attribute="cell_id")
     status = EnumField(minesweeper.models.game.CellStatus)
+    value = fields.Integer()
     has_mine = fields.Boolean()
     coordinate_x = fields.Integer()
     coordinate_y = fields.Integer()

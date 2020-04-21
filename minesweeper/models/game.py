@@ -12,8 +12,9 @@ class GameStatus(Enum):
 
 class CellStatus(Enum):
     UNKNOWN = 0
-    DISCOVERED = 2
     FLAG = 1
+    DISCOVERED = 2
+    QUESTION = 3
 
 
 class Cell(db.Model):
@@ -29,6 +30,7 @@ class Cell(db.Model):
     status = db.Column("status", db.Enum(CellStatus),
                        nullable=False,
                        default=CellStatus.UNKNOWN)
+    value = db.Column("value", db.Integer, nullable=True)
     has_mine = db.Column("has_mine", db.Boolean, nullable=False, default=False)
     coordinate_x = db.Column("x", db.BigInteger, nullable=False)
     coordinate_y = db.Column("y", db.BigInteger, nullable=False)
