@@ -53,9 +53,7 @@ def delete_game_by_id(game_id):
 
 def _discover_cell(game, cell):
     cell.status = CellStatus.DISCOVERED
-    if cell.has_mine:
-        game.status = GameStatus.LOST
-    else:
+    if not cell.has_mine:
         cells_adjacent = [x for x in _get_adjacent_cells(game, cell)
                           if x.status in
                           [CellStatus.UNKNOWN, CellStatus.QUESTION]]
@@ -88,6 +86,20 @@ def _is_adjacent_cell(cell, target):
                cell.coordinate_x, cell.coordinate_y)
 
 
+def _get_game_status(cells):
+    discovered_cells = [cell for cell in cells
+                        if cell.status == CellStatus.DISCOVERED]
+    undiscovered_cells = [cell for cell in cells
+                          if cell not in discovered_cells]
+    if any([cell.has_mine for cell in discovered_cells]):
+        return GameStatus.LOST
+    if all([cell.has_mine and cell.status != CellStatus.QUESTION
+            for cell in undiscovered_cells]):
+        return GameStatus.WIN
+    else:
+        return GameStatus.IN_PROGRESS
+
+
 def set_cell_action(game_id, coordinate_x, coordinate_y, action_cell):
     game = get_game_by_id(game_id)
     if not game:
@@ -109,5 +121,6 @@ def set_cell_action(game_id, coordinate_x, coordinate_y, action_cell):
         raise GameCellPerformActionError(game.game_id, cell, action_cell)
 
     _change_cell_status(game, cell, action_cell)
-
+    game.status = _get_game_status(game.cells)
+    game.update(db.session)
     return game
