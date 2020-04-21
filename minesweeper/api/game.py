@@ -4,7 +4,6 @@ import flask_restplus
 import webargs.flaskparser
 
 from minesweeper.errors import HttpError
-from minesweeper.models.game import CellStatus
 from minesweeper.schema.game import GameListPostRequestSchema, GameModelSchema, \
     GameListGetRequestSchema, GamePutRequestSchema
 from minesweeper.services.game import create_game, get_games, get_game_by_id, \

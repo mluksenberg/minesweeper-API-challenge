@@ -3,7 +3,7 @@ from flask import Flask
 import minesweeper.api
 import minesweeper.config
 import minesweeper.extensions
-from minesweeper.errors import HttpError, GameBaseError
+from minesweeper.errors import GameBaseError
 
 
 def create_app(config: object = minesweeper.config.Config) -> Flask:

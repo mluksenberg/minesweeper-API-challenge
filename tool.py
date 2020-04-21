@@ -92,7 +92,11 @@ def cli(ctx, debug, env):
 @click.pass_context
 def show_board(ctx, game_id):
     url = _get_game_url(ctx.obj["ENV"], game_id)
-    response = requests.get(url).json()
+    response = requests.get(url)
+    if response.status_code != 200:
+        click.echo(click.style(f"Error: {response.json()}", fg="red"))
+        return
+    response = response.json()
     rows_size = max(
         map(lambda x: x.get("coordinate_x"), response.get("board"))) + 1
     _draw_game_context(response)
@@ -180,6 +184,22 @@ def create_game(ctx, mines, width, height):
         click.echo(click.style(f"Error: {response.json()}", fg="red"))
     else:
         click.echo(f"Game Created with ID: {response.json().get('id')}")
+
+@cli.command()
+@click.option("--status",
+              "-s", default=None,
+              help="Field use to filter games by status. It could be one of "
+                   "IN_PRGRESS, WIN, LOST")
+@click.pass_context
+def show_games(ctx, status):
+    url = _get_game_url(ctx.obj["ENV"])
+    params = None if not status else {"status": status}
+    response = requests.get(url, params=params)
+    if response.status_code != 200:
+        click.echo(click.style(f"Error: {response.text}", fg="red"))
+    else:
+        for game in response.json():
+            click.echo(f"- ID: {game.get('id')}")
 
 
 if __name__ == '__main__':

@@ -38,6 +38,7 @@ class GameListPostRequestSchema(GameBaseSchema):
 class GameListGetRequestSchema(GameBaseSchema):
     status = EnumField(minesweeper.models.game.GameStatus,
                        required=False,
+                       missing=None,
                        dump_by=EnumField.VALUE)
 
 
