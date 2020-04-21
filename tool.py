@@ -32,7 +32,7 @@ def _draw_current_board(response):
     rows_size = max(
         map(lambda x: x.get("coordinate_y"), response.get("board"))) + 1
     for i in range(rows_size):
-        row = list(filter(lambda x: x.get("coordinate_y") == i, cells))
+        row = sorted([x for x in cells if x.get("coordinate_y") == i], key=lambda x: x.get("coordinate_x"))
         click.echo("".join(map(lambda r: _draw_cell(r), row)))
 
 
@@ -41,7 +41,7 @@ def _discover_board(response):
     rows_size = max(
         map(lambda x: x.get("coordinate_y"), response.get("board"))) + 1
     for i in range(rows_size):
-        row = list(filter(lambda x: x.get("coordinate_y") == i, cells))
+        row = sorted([x for x in cells if x.get("coordinate_y") == i], key=lambda x: x.get("coordinate_x"))
         click.echo("".join(map(lambda r: show_value(r), row)))
 
 
@@ -106,7 +106,7 @@ def show_board(ctx, game_id):
 def _draw_game_context(response):
     time = datetime.datetime.utcfromtimestamp(
         datetime.datetime.utcnow().timestamp() - response.get(
-            "datetime")).strftime("%H:%m:%S")
+            "datetime")).strftime("%H:%M:%S")
     status = response.get("status")
     click.echo(f"Status: {status}\nClock: {time}")
 
@@ -177,7 +177,7 @@ def create_game(ctx, mines, width, height):
                                    "width": width,
                                    "height": height})
     if response.status_code != 200:
-        click.echo(click.style(f"Error: {response.text}", fg="red"))
+        click.echo(click.style(f"Error: {response.json()}", fg="red"))
     else:
         click.echo(f"Game Created with ID: {response.json().get('id')}")
 
