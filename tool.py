@@ -177,7 +177,7 @@ def create_game(ctx, mines, width, height):
                                    "width": width,
                                    "height": height})
     if response.status_code != 200:
-        click.echo(click.style(f"Error: {response.json()}", fg="red"))
+        click.echo(click.style(f"Error: {response.text}", fg="red"))
     else:
         click.echo(f"Game Created with ID: {response.json().get('id')}")
 

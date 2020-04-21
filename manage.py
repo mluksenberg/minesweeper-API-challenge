@@ -1,4 +1,5 @@
 import flask_script
+from flask_migrate import Migrate, MigrateCommand
 from sqlalchemy_utils import create_database, database_exists
 
 import minesweeper.app
@@ -15,19 +16,12 @@ def make_app_context():
 
 
 app = minesweeper.app.create_app()
+migrate = Migrate(app, minesweeper.extensions.db)
 manager = flask_script.Manager(app)
 
 manager.add_command("runserver", flask_script.Server("0.0.0.0", threaded=True))
 manager.add_command("shell", flask_script.Shell(make_context=make_app_context))
-
-
-@manager.command
-def create_db():
-    if not database_exists(minesweeper.config.Config.SQLALCHEMY_DATABASE_URI):
-        create_database(minesweeper.config.Config.SQLALCHEMY_DATABASE_URI)
-        with app.app_context():
-            minesweeper.extensions.db.create_all()
-
+manager.add_command("db", MigrateCommand)
 
 if __name__ == '__main__':
     manager.run()
